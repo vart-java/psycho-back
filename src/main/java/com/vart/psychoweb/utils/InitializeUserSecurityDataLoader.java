@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -78,7 +77,7 @@ public class InitializeUserSecurityDataLoader implements CommandLineRunner {
         if (userOptional.isPresent() // if user is present and not admin
                 && !loadUsername.equals(username)) {
             return;
-        } else if (loadUsername.equals(username) && userOptional.isPresent()) { // is user admin - we must update him
+        } else if (loadUsername.equals(username) && userOptional.isPresent()) { // if user admin - we must update him
             User user = userOptional.get();
             user.setUsername(loadUsername);
             user.setPassword(passwordEncoder.encode(loadPassword));
