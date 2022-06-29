@@ -33,7 +33,7 @@ public class ConsultationRequestController {
                 postConsultationRequestDto.getEmail(),
                 postConsultationRequestDto.getSubject()
         );
-        template.send("consultation", consultationRequest);
+        template.send("consultation", consultationRequestMapper.fromEntityToMobileInterfaceConsultationDto(consultationRequest));
         return ResponseEntity.ok(consultationRequestMapper.fromEntityToGetDto(consultationRequest));
     }
 
