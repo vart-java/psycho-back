@@ -22,7 +22,10 @@ public class ConsultationRequestServiceImpl implements ConsultationRequestServic
 
     @Override
     public ConsultationRequest create(Integer phoneNumber, String email, String subject) {
-        User user = userService.create(phoneNumber, email);
+        User user = userService.findByPhoneNumberOrEmail(phoneNumber, email);
+        if (user == null) {
+            user = userService.create(phoneNumber, email);
+        }
         ConsultationRequest consultationRequest = ConsultationRequest.builder()
                 .user(user)
                 .subject(subject)
@@ -33,7 +36,7 @@ public class ConsultationRequestServiceImpl implements ConsultationRequestServic
     @Override
     public ConsultationRequest findById(long id) {
         return consultationRequestRepository.findById(id).orElseThrow(
-                ()->new ConsultationRequestNotFoundException(CONSULTATION_NOT_FOUND_EXCEPTION+id));
+                () -> new ConsultationRequestNotFoundException(CONSULTATION_NOT_FOUND_EXCEPTION + id));
     }
 
     @Override

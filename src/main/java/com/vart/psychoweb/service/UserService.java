@@ -11,4 +11,6 @@ public interface UserService {
     boolean checkExistingByPhoneNumber(Integer phoneNumber);
 
     boolean checkExistingByEmail (String email);
+
+    User findByPhoneNumberOrEmail(Integer phoneNumber, String email);
 }
