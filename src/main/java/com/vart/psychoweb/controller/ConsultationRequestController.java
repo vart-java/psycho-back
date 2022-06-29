@@ -9,6 +9,7 @@ import com.vart.psychoweb.service.ConsultationRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class ConsultationRequestController {
     private final ConsultationRequestService consultationRequestService;
     private final ConsultationRequestMapper consultationRequestMapper;
+    private final KafkaTemplate<Object, Object> template;
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<GetConsultationRequestDto> getConsultationRequest(@PathVariable(name = "id") long id) {
@@ -24,17 +26,20 @@ public class ConsultationRequestController {
     }
 
     @PostMapping
-    public ResponseEntity<GetConsultationRequestDto> createConsultationRequest(@RequestBody PostConsultationRequestDto postConsultationRequestDto) {
+    public ResponseEntity<GetConsultationRequestDto> createConsultationRequest(
+            @RequestBody PostConsultationRequestDto postConsultationRequestDto) {
         ConsultationRequest consultationRequest = consultationRequestService.create(
                 postConsultationRequestDto.getPhoneNumber(),
                 postConsultationRequestDto.getEmail(),
                 postConsultationRequestDto.getSubject()
         );
+        template.send("consultation", consultationRequestMapper.fromEntityToMobileInterfaceConsultationDto(consultationRequest));
         return ResponseEntity.ok(consultationRequestMapper.fromEntityToGetDto(consultationRequest));
     }
 
     @PutMapping
-    public ResponseEntity<GetConsultationRequestDto> updateConsultationRequest(@RequestBody PutConsultationRequestDto putConsultationRequestDto) {
+    public ResponseEntity<GetConsultationRequestDto> updateConsultationRequest(
+            @RequestBody PutConsultationRequestDto putConsultationRequestDto) {
         ConsultationRequest consultationRequest = consultationRequestService.update(
                 putConsultationRequestDto.getId(),
                 putConsultationRequestDto.getSubject()

@@ -83,4 +83,21 @@ public class UserServiceImpl implements UserService {
     public boolean checkExistingByEmail(String email) {
         return userRepository.findByEmail(Objects.requireNonNull(email)).isPresent();
     }
+
+    @Override
+    public User findByPhoneNumberOrEmail(Integer phoneNumber, String email) {
+        if (phoneNumber == null && email == null) throw new UserNullDataException(USER_DATA_NULL_EXCEPTION);
+        if (phoneNumber == null && checkExistingByEmail(email)) {
+            return userRepository.findByEmail(Objects.requireNonNull(email)).orElseThrow(
+                    () -> new UsernameNotFoundException(USER_NOT_FOUND_EXCEPTION + " email: " + email));
+        } else if (email == null && checkExistingByPhoneNumber(phoneNumber)) {
+            return userRepository.findByPhoneNumber(Objects.requireNonNull(phoneNumber)).orElseThrow(
+                    () -> new UsernameNotFoundException(USER_NOT_FOUND_EXCEPTION + " phone number: " + phoneNumber));
+        } else if (checkExistingByPhoneNumber(phoneNumber) && checkExistingByEmail(email)) {
+            User user = userRepository.findByPhoneNumber(phoneNumber).orElseThrow(
+                    () -> new UsernameNotFoundException(USER_NOT_FOUND_EXCEPTION + " phone number: " + phoneNumber));
+            if (user.getEmail().equals(email)) return user;
+        }
+        return null;
+    }
 }
